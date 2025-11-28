@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -87,14 +87,7 @@ export function PaymentDetailModal({
   const [chequeNumber, setChequeNumber] = useState("");
   const [userRole, setUserRole] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (open && paymentId) {
-      loadPaymentDetails();
-      checkUserRole();
-    }
-  }, [open, paymentId]);
-
-  async function loadPaymentDetails() {
+  const loadPaymentDetails = useCallback(async () => {
     if (!paymentId) return;
 
     try {
@@ -132,9 +125,9 @@ export function PaymentDetailModal({
     } finally {
       setLoading(false);
     }
-  }
+  }, [paymentId]);
 
-  async function checkUserRole() {
+  const checkUserRole = useCallback(async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
@@ -155,7 +148,14 @@ export function PaymentDetailModal({
     } catch (error) {
       console.error("Error checking user role:", error);
     }
-  }
+  }, []);
+
+  useEffect(() => {
+    if (open && paymentId) {
+      loadPaymentDetails();
+      checkUserRole();
+    }
+  }, [open, paymentId, loadPaymentDetails, checkUserRole]);
 
   async function handleApprove() {
     if (!payment) return;

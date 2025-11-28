@@ -54,7 +54,7 @@ export default function DashboardLayout({
           <div className="flex items-center flex-shrink-0 px-4 py-5 border-b">
             <div className="flex items-center gap-3">
               <img
-                src="/images/unre-logo.png"
+                src="/images/unre-logo.svg"
                 alt="UNRE Logo"
                 className="h-10 w-10 object-contain"
               />
@@ -109,7 +109,7 @@ export default function DashboardLayout({
             <div className="flex items-center justify-between flex-shrink-0 px-4 py-5 border-b">
               <div className="flex items-center gap-3">
                 <img
-                  src="/images/unre-logo.png"
+                  src="/images/unre-logo.svg"
                   alt="UNRE Logo"
                   className="h-10 w-10 object-contain"
                 />

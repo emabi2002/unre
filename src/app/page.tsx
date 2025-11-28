@@ -13,7 +13,7 @@ export default function Home() {
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <img
-              src="/images/unre-logo.png"
+              src="/images/unre-logo.svg"
               alt="UNRE Logo"
               className="h-12 w-12 object-contain"
             />
@@ -334,7 +334,7 @@ export default function Home() {
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <div className="flex items-center gap-3">
               <img
-                src="/images/unre-logo.png"
+                src="/images/unre-logo.svg"
                 alt="UNRE Logo"
                 className="h-10 w-10 object-contain"
               />

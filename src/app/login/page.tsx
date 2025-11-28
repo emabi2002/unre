@@ -43,7 +43,7 @@ export default function LoginPage() {
       <Card className="w-full max-w-md p-8 bg-white shadow-xl">
         <div className="flex items-center justify-center gap-3 mb-8">
           <img
-            src="/images/unre-logo.png"
+            src="/images/unre-logo.svg"
             alt="UNRE Logo"
             className="h-16 w-16 object-contain"
           />

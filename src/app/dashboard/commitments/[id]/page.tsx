@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -31,13 +31,7 @@ export default function CommitmentDetailPage() {
   const [commitment, setCommitment] = useState<Commitment | null>(null);
   const [payments, setPayments] = useState<PaymentVoucher[]>([]);
 
-  useEffect(() => {
-    if (commitmentId) {
-      loadCommitmentDetails();
-    }
-  }, [commitmentId]);
-
-  async function loadCommitmentDetails() {
+  const loadCommitmentDetails = useCallback(async () => {
     try {
       setLoading(true);
 
@@ -54,7 +48,13 @@ export default function CommitmentDetailPage() {
     } finally {
       setLoading(false);
     }
-  }
+  }, [commitmentId]);
+
+  useEffect(() => {
+    if (commitmentId) {
+      loadCommitmentDetails();
+    }
+  }, [commitmentId, loadCommitmentDetails]);
 
   function getStatusColor(status: string) {
     switch (status.toLowerCase()) {
