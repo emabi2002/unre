@@ -24,6 +24,8 @@ import { supabase } from "@/lib/supabase";
 import { createPaymentVoucher } from "@/lib/payments";
 import { toast } from "sonner";
 import { Loader2, AlertCircle } from "lucide-react";
+import { FileUpload } from "@/components/ui/file-upload";
+import { uploadDocument } from "@/lib/storage";
 
 interface CreatePaymentVoucherDialogProps {
   open: boolean;
@@ -74,6 +76,7 @@ export function CreatePaymentVoucherDialog({
   const [description, setDescription] = useState<string>("");
   const [bankName, setBankName] = useState<string>("");
   const [accountNumber, setAccountNumber] = useState<string>("");
+  const [attachments, setAttachments] = useState<File[]>([]);
 
   // Validation errors
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -202,7 +205,7 @@ export function CreatePaymentVoucherDialog({
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
 
-      await createPaymentVoucher(
+      const voucherId = await createPaymentVoucher(
         {
           ge_request_id: commitment.ge_request_id,
           commitment_id: commitment.id,
@@ -217,7 +220,38 @@ export function CreatePaymentVoucherDialog({
         user.id
       );
 
-      toast.success("Payment voucher created successfully!");
+      // Upload attachments if any
+      if (attachments.length > 0 && voucherId) {
+        toast.info(`Uploading ${attachments.length} document(s)...`);
+        try {
+          for (const file of attachments) {
+            const uploadedDoc = await uploadDocument(file, 'documents', 'payment-vouchers');
+
+            // Save document record to database
+            // @ts-expect-error - Supabase type mismatch
+            await supabase.from('documents').insert({
+              file_name: file.name,
+              file_size: file.size,
+              file_type: file.type,
+              file_extension: file.name.split('.').pop(),
+              storage_path: uploadedDoc.path,
+              storage_bucket: 'documents',
+              file_url: uploadedDoc.url,
+              document_type: 'invoice',
+              related_to_type: 'payment_voucher',
+              related_to_id: voucherId,
+              uploaded_by: user.id,
+            });
+          }
+          toast.success(`Payment voucher created with ${attachments.length} document(s)!`);
+        } catch (uploadError) {
+          console.error('Error uploading documents:', uploadError);
+          toast.warning('Payment voucher created but some documents failed to upload');
+        }
+      } else {
+        toast.success("Payment voucher created successfully!");
+      }
+
       onOpenChange(false);
       onSuccess?.();
     } catch (error) {
@@ -480,6 +514,21 @@ export function CreatePaymentVoucherDialog({
                   {errors.description}
                 </p>
               )}
+            </div>
+
+            {/* Supporting Documents */}
+            <div className="space-y-2">
+              <Label>Supporting Documents (Optional)</Label>
+              <p className="text-xs text-slate-500 mb-2">
+                Upload invoices, receipts, or other supporting documents
+              </p>
+              <FileUpload
+                files={attachments}
+                onFilesSelected={(files) => setAttachments([...attachments, ...files])}
+                onFileRemoved={(index) => setAttachments(attachments.filter((_, i) => i !== index))}
+                maxFiles={5}
+                accept=".pdf,.jpg,.jpeg,.png"
+              />
             </div>
 
             <DialogFooter>

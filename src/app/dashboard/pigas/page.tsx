@@ -16,16 +16,20 @@ import {
   Database,
   ArrowRight,
   Clock,
+  Loader2,
 } from "lucide-react";
 import { toast } from "sonner";
+import { parsePIGASFile, importPIGASBudget, validatePIGASData, downloadPIGASTemplate } from "@/lib/pigas-import";
 
 export default function PIGASPage() {
   const [syncing, setSyncing] = useState(false);
   const [file, setFile] = useState<File | null>(null);
+  const [importResult, setImportResult] = useState<any>(null);
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       setFile(e.target.files[0]);
+      setImportResult(null); // Clear previous results
     }
   };
 
@@ -35,13 +39,52 @@ export default function PIGASPage() {
       return;
     }
 
-    setSyncing(true);
-    // Simulate upload and processing
-    setTimeout(() => {
-      toast.success(`PIGAS data synchronized successfully! ${mockSyncStats.budgetLinesUpdated} budget lines updated.`);
-      setFile(null);
+    try {
+      setSyncing(true);
+      toast.info("Parsing PIGAS file...");
+
+      // Parse the file
+      const budgetLines = await parsePIGASFile(file);
+
+      if (budgetLines.length === 0) {
+        toast.error("No valid budget lines found in file");
+        setSyncing(false);
+        return;
+      }
+
+      // Validate data
+      const validation = validatePIGASData(budgetLines);
+
+      if (!validation.valid) {
+        toast.error(`Validation failed: ${validation.errors.join(', ')}`);
+        setSyncing(false);
+        return;
+      }
+
+      if (validation.warnings.length > 0) {
+        toast.warning(`Warnings: ${validation.warnings.join(', ')}`);
+      }
+
+      toast.info(`Importing ${budgetLines.length} budget lines...`);
+
+      // Import to database
+      const result = await importPIGASBudget(budgetLines);
+      setImportResult(result);
+
+      if (result.success) {
+        toast.success(
+          `PIGAS data synchronized successfully! ${result.importedCount} new, ${result.updatedCount} updated. Total: K ${(result.totalAmount / 1000).toFixed(0)}k`
+        );
+        setFile(null);
+      } else {
+        toast.error(`Import completed with errors: ${result.errorCount} errors`);
+      }
+    } catch (error: any) {
+      console.error('Error importing PIGAS data:', error);
+      toast.error(`Failed to import: ${error.message}`);
+    } finally {
       setSyncing(false);
-    }, 2000);
+    }
   };
 
   // Mock data
@@ -134,9 +177,9 @@ export default function PIGASPage() {
           <p className="text-slate-600">Synchronize AAP budget and expenditure data with PIGAS</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline">
+          <Button variant="outline" onClick={downloadPIGASTemplate}>
             <Download className="mr-2 h-4 w-4" />
-            Export Template
+            Download Template
           </Button>
           <Button variant="outline">
             <FileText className="mr-2 h-4 w-4" />
@@ -319,6 +362,59 @@ export default function PIGASPage() {
           </div>
         </div>
       </Card>
+
+      {/* Import Results */}
+      {importResult && (
+        <Card className={`p-6 ${importResult.success ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}`}>
+          <div className="flex items-start gap-4">
+            <div className={`p-3 rounded-lg ${importResult.success ? 'bg-green-500' : 'bg-red-500'}`}>
+              {importResult.success ? (
+                <CheckCircle className="h-6 w-6 text-white" />
+              ) : (
+                <AlertCircle className="h-6 w-6 text-white" />
+              )}
+            </div>
+            <div className="flex-1">
+              <h3 className={`text-lg font-semibold mb-2 ${importResult.success ? 'text-green-900' : 'text-red-900'}`}>
+                {importResult.success ? 'Import Successful' : 'Import Completed with Errors'}
+              </h3>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-3">
+                <div>
+                  <p className="text-sm text-slate-600">New Lines</p>
+                  <p className="text-xl font-bold text-slate-900">{importResult.importedCount}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-slate-600">Updated</p>
+                  <p className="text-xl font-bold text-slate-900">{importResult.updatedCount}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-slate-600">Total Amount</p>
+                  <p className="text-xl font-bold text-slate-900">K {(importResult.totalAmount / 1000).toFixed(0)}k</p>
+                </div>
+                <div>
+                  <p className="text-sm text-slate-600">Errors</p>
+                  <p className={`text-xl font-bold ${importResult.errorCount > 0 ? 'text-red-600' : 'text-green-600'}`}>
+                    {importResult.errorCount}
+                  </p>
+                </div>
+              </div>
+              {importResult.errors.length > 0 && (
+                <div className="mt-3">
+                  <p className="text-sm font-semibold text-red-900 mb-1">Errors:</p>
+                  <ul className="text-sm text-red-800 space-y-1">
+                    {importResult.errors.slice(0, 5).map((error: string, index: number) => (
+                      <li key={index}>• {error}</li>
+                    ))}
+                    {importResult.errors.length > 5 && (
+                      <li>• ...and {importResult.errors.length - 5} more</li>
+                    )}
+                  </ul>
+                </div>
+              )}
+            </div>
+          </div>
+        </Card>
+      )}
 
       {/* Sync History */}
       <Card className="p-6">

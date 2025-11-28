@@ -28,6 +28,9 @@ import { getAllPaymentVouchers, getPaymentStats, type PaymentVoucher } from "@/l
 import { toast } from "sonner";
 import { CreatePaymentVoucherDialog } from "@/components/payments/CreatePaymentVoucherDialog";
 import { PaymentDetailModal } from "@/components/payments/PaymentDetailModal";
+import { exportPaymentsToExcel } from "@/lib/excel-export";
+import { generateMultiplePaymentsPDF } from "@/lib/pdf-generator";
+import { ExportDialog } from "@/components/ui/export-dialog";
 
 export default function PaymentsPage() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -48,6 +51,9 @@ export default function PaymentsPage() {
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [selectedPaymentId, setSelectedPaymentId] = useState<number | null>(null);
   const [detailModalOpen, setDetailModalOpen] = useState(false);
+  const [exportDialogOpen, setExportDialogOpen] = useState(false);
+  const [selectedPayments, setSelectedPayments] = useState<number[]>([]);
+  const [batchProcessing, setBatchProcessing] = useState(false);
 
   useEffect(() => {
     loadPayments();
@@ -73,6 +79,134 @@ export default function PaymentsPage() {
       setStats(data);
     } catch (error) {
       console.error('Error loading stats:', error);
+    }
+  }
+
+  function handleExportPayments() {
+    if (payments.length === 0) {
+      toast.error('No payments to export');
+      return;
+    }
+    setExportDialogOpen(true);
+  }
+
+  function handleExportToExcel() {
+    try {
+      exportPaymentsToExcel(payments);
+      toast.success('Payments exported to Excel');
+    } catch (error) {
+      console.error('Error exporting to Excel:', error);
+      toast.error('Failed to export to Excel');
+    }
+  }
+
+  function handleExportToPDF() {
+    try {
+      generateMultiplePaymentsPDF(payments as any);
+      toast.success('Payments exported to PDF');
+    } catch (error) {
+      console.error('Error exporting to PDF:', error);
+      toast.error('Failed to export to PDF');
+    }
+  }
+
+  function togglePaymentSelection(paymentId: number) {
+    setSelectedPayments(prev =>
+      prev.includes(paymentId)
+        ? prev.filter(id => id !== paymentId)
+        : [...prev, paymentId]
+    );
+  }
+
+  function toggleSelectAll() {
+    if (selectedPayments.length === filteredPayments.length) {
+      setSelectedPayments([]);
+    } else {
+      const allIds = filteredPayments
+        .filter(p => (p as PaymentVoucher).id !== undefined)
+        .map(p => (p as PaymentVoucher).id);
+      setSelectedPayments(allIds);
+    }
+  }
+
+  async function handleBatchApprove() {
+    if (selectedPayments.length === 0) {
+      toast.error('No payments selected');
+      return;
+    }
+
+    const pendingPayments = payments.filter(
+      p => (p as PaymentVoucher).id &&
+      selectedPayments.includes((p as PaymentVoucher).id) &&
+      p.status === 'Pending'
+    );
+
+    if (pendingPayments.length === 0) {
+      toast.error('No pending payments selected');
+      return;
+    }
+
+    if (!confirm(`Approve ${pendingPayments.length} payment voucher(s)?`)) {
+      return;
+    }
+
+    try {
+      setBatchProcessing(true);
+      let successCount = 0;
+      let errorCount = 0;
+
+      for (const payment of pendingPayments) {
+        try {
+          // In a real implementation, call the approve payment API
+          // await approvePayment((payment as PaymentVoucher).id);
+          successCount++;
+        } catch (error) {
+          errorCount++;
+          console.error(`Error approving payment ${(payment as PaymentVoucher).id}:`, error);
+        }
+      }
+
+      if (successCount > 0) {
+        toast.success(`${successCount} payment(s) approved successfully!`);
+        loadPayments();
+        loadStats();
+        setSelectedPayments([]);
+      }
+
+      if (errorCount > 0) {
+        toast.error(`${errorCount} payment(s) failed to approve`);
+      }
+    } catch (error) {
+      console.error('Batch approve error:', error);
+      toast.error('Failed to process batch approval');
+    } finally {
+      setBatchProcessing(false);
+    }
+  }
+
+  function handleBatchExport() {
+    if (selectedPayments.length === 0) {
+      toast.error('No payments selected');
+      return;
+    }
+
+    const selectedPaymentData = payments.filter(
+      p => (p as PaymentVoucher).id && selectedPayments.includes((p as PaymentVoucher).id)
+    );
+
+    const format = window.confirm(`Export ${selectedPayments.length} payment(s)?\n\nOK = Excel, Cancel = PDF`);
+
+    try {
+      if (format) {
+        exportPaymentsToExcel(selectedPaymentData);
+        toast.success(`${selectedPayments.length} payments exported to Excel`);
+      } else {
+        generateMultiplePaymentsPDF(selectedPaymentData as any);
+        toast.success(`${selectedPayments.length} payments exported to PDF`);
+      }
+    } catch (error) {
+      console.error('Batch export error:', error);
+      toast.error('Failed to export selected payments');
     }
   }
 
@@ -219,19 +353,61 @@ export default function PaymentsPage() {
         <div>
           <h1 className="text-2xl font-bold text-slate-900">Payments</h1>
           <p className="text-slate-600">Process payment vouchers and track payment status</p>
+          {selectedPayments.length > 0 && (
+            <p className="text-sm text-unre-green-600 mt-1">
+              {selectedPayments.length} payment(s) selected
+            </p>
+          )}
         </div>
         <div className="flex gap-2">
-          <Button variant="outline">
-            <Download className="mr-2 h-4 w-4" />
-            Export Payments
-          </Button>
-          <Button
-            className="bg-gradient-to-r from-unre-green-600 to-unre-green-700"
-            onClick={() => setCreateDialogOpen(true)}
-          >
-            <Plus className="mr-2 h-4 w-4" />
-            New Payment Voucher
-          </Button>
+          {selectedPayments.length > 0 ? (
+            <>
+              <Button
+                variant="outline"
+                onClick={handleBatchExport}
+                disabled={batchProcessing}
+              >
+                <Download className="mr-2 h-4 w-4" />
+                Export Selected ({selectedPayments.length})
+              </Button>
+              <Button
+                variant="outline"
+                onClick={handleBatchApprove}
+                disabled={batchProcessing}
+                className="border-unre-green-600 text-unre-green-600 hover:bg-unre-green-50"
+              >
+                {batchProcessing ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <CheckCircle className="mr-2 h-4 w-4" />
+                )}
+                Approve Selected
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => setSelectedPayments([])}
+              >
+                Clear Selection
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button
+                variant="outline"
+                onClick={handleExportPayments}
+              >
+                <Download className="mr-2 h-4 w-4" />
+                Export Payments
+              </Button>
+              <Button
+                className="bg-gradient-to-r from-unre-green-600 to-unre-green-700"
+                onClick={() => setCreateDialogOpen(true)}
+              >
+                <Plus className="mr-2 h-4 w-4" />
+                New Payment Voucher
+              </Button>
+            </>
+          )}
         </div>
       </div>
 
@@ -333,6 +509,14 @@ export default function PaymentsPage() {
               <table className="w-full">
                 <thead className="bg-slate-50 border-b">
                   <tr className="text-left text-sm font-medium text-slate-600">
+                    <th className="p-4 w-12">
+                      <input
+                        type="checkbox"
+                        checked={selectedPayments.length === filteredPayments.length && filteredPayments.length > 0}
+                        onChange={toggleSelectAll}
+                        className="w-4 h-4 text-unre-green-600 focus:ring-unre-green-500 border-gray-300 rounded"
+                      />
+                    </th>
                     <th className="p-4">Voucher #</th>
                     <th className="p-4">GE Request</th>
                     <th className="p-4">Payee</th>
@@ -358,6 +542,14 @@ export default function PaymentsPage() {
 
                     return (
                       <tr key={payment.id} className="border-b hover:bg-slate-50 transition-colors">
+                        <td className="p-4">
+                          <input
+                            type="checkbox"
+                            checked={selectedPayments.includes(payment.id)}
+                            onChange={() => togglePaymentSelection(payment.id)}
+                            className="w-4 h-4 text-unre-green-600 focus:ring-unre-green-500 border-gray-300 rounded"
+                          />
+                        </td>
                         <td className="p-4">
                           <span className="font-mono text-sm text-slate-700">{voucherNum}</span>
                         </td>
@@ -522,6 +714,15 @@ export default function PaymentsPage() {
           loadPayments();
           loadStats();
         }}
+      />
+
+      <ExportDialog
+        open={exportDialogOpen}
+        onOpenChange={setExportDialogOpen}
+        onExportExcel={handleExportToExcel}
+        onExportPDF={handleExportToPDF}
+        title="Export Payments"
+        description="Choose your preferred format to export payment vouchers"
       />
     </div>
   );

@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { FileUpload } from "@/components/ui/file-upload";
 import {
   Select,
   SelectContent,
@@ -446,52 +447,16 @@ export default function NewRequestPage() {
         {/* Attachments */}
         <Card className="p-6">
           <h3 className="text-lg font-semibold text-slate-900 mb-4">Supporting Documents</h3>
-          <div className="space-y-4">
-            <div>
-              <Label htmlFor="attachments">
-                Upload Files (Quotes, Invoices, Memos, etc.)
-              </Label>
-              <div className="mt-2 flex items-center gap-4">
-                <Input
-                  id="attachments"
-                  type="file"
-                  multiple
-                  onChange={handleFileChange}
-                  className="flex-1"
-                />
-                <Button type="button" variant="outline">
-                  <Upload className="h-4 w-4 mr-2" />
-                  Upload
-                </Button>
-              </div>
-              <p className="text-xs text-slate-500 mt-1">
-                Accepted: PDF, JPG, PNG, DOC, DOCX, XLS, XLSX (Max 10MB per file)
-              </p>
-            </div>
-
-            {attachments.length > 0 && (
-              <div className="space-y-2">
-                <p className="text-sm font-medium text-slate-700">Uploaded Files:</p>
-                {attachments.map((file, index) => (
-                  <div key={index} className="flex items-center justify-between p-3 bg-slate-50 rounded border">
-                    <div className="flex items-center gap-2">
-                      <Upload className="h-4 w-4 text-blue-600" />
-                      <span className="text-sm text-slate-700">{file.name}</span>
-                      <span className="text-xs text-slate-500">({(file.size / 1024).toFixed(1)} KB)</span>
-                    </div>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => removeAttachment(index)}
-                    >
-                      <Trash2 className="h-4 w-4 text-red-600" />
-                    </Button>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+          <p className="text-sm text-slate-600 mb-4">
+            Upload quotes, invoices, memos, and other supporting documents for this request.
+          </p>
+          <FileUpload
+            files={attachments}
+            onFilesSelected={(files) => setAttachments([...attachments, ...files])}
+            onFileRemoved={removeAttachment}
+            maxFiles={10}
+            accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.xls,.xlsx"
+          />
         </Card>
 
         {/* Actions */}
