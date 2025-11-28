@@ -7,9 +7,9 @@ import Link from "next/link";
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-green-50 to-slate-50">
+    <div className="min-h-screen bg-white">
       {/* Header */}
-      <header className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-50">
+      <header className="border-b bg-white sticky top-0 z-50 shadow-sm">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <img
@@ -24,7 +24,7 @@ export default function Home() {
           </div>
           <div className="flex gap-3">
             <Link href="/login">
-              <Button variant="outline">Login</Button>
+              <Button variant="outline" className="border-slate-300">Login</Button>
             </Link>
             <Link href="/demo">
               <Button className="bg-gradient-to-r from-unre-green-600 to-unre-green-700 hover:from-unre-green-700 hover:to-unre-green-800">
@@ -36,23 +36,32 @@ export default function Home() {
       </header>
 
       {/* Hero Section */}
-      <section className="container mx-auto px-4 py-16">
+      <section className="container mx-auto px-4 py-20 bg-gradient-to-b from-slate-50/50 to-white">
         <div className="text-center max-w-4xl mx-auto mb-16">
-          <h2 className="text-5xl font-bold text-slate-900 mb-6">
-            Automated GE Request & Budget Control System
+          <div className="inline-block mb-6 px-4 py-2 bg-unre-green-50 border border-unre-green-100 rounded-full">
+            <span className="text-sm font-semibold text-unre-green-800">
+              Digital Transformation for Higher Education
+            </span>
+          </div>
+          <h2 className="text-5xl md:text-6xl font-bold text-slate-900 mb-6 leading-tight">
+            Automated GE Request &<br />Budget Control System
           </h2>
-          <p className="text-xl text-slate-600 mb-8">
-            University of Natural Resources & Environment of PNG<br />
+          <p className="text-xl text-slate-700 mb-4 font-medium">
+            University of Natural Resources & Environment of PNG
+          </p>
+          <p className="text-lg text-slate-600 mb-10 leading-relaxed">
             Streamline approvals, eliminate paperwork, and gain real-time visibility into your spending
           </p>
-          <div className="flex gap-4 justify-center">
+          <div className="flex gap-4 justify-center flex-wrap">
             <Link href="/login">
-              <Button size="lg" className="bg-gradient-to-r from-unre-green-600 to-unre-green-700 hover:from-unre-green-700 hover:to-unre-green-800">
+              <Button size="lg" className="bg-gradient-to-r from-unre-green-600 to-unre-green-700 hover:from-unre-green-700 hover:to-unre-green-800 shadow-lg hover:shadow-xl transition-all">
                 Get Started
               </Button>
             </Link>
             <Link href="#features">
-              <Button size="lg" variant="outline">Learn More</Button>
+              <Button size="lg" variant="outline" className="border-2 border-slate-300 hover:border-unre-green-600 hover:bg-unre-green-50">
+                Learn More
+              </Button>
             </Link>
           </div>
         </div>
@@ -65,8 +74,8 @@ export default function Home() {
             { label: "Complete Audit Trail", value: "Full", icon: Shield },
             { label: "Real-time Visibility", value: "24/7", icon: Users },
           ].map((stat, idx) => (
-            <Card key={idx} className="p-6 text-center hover:shadow-lg transition-shadow bg-white">
-              <stat.icon className="h-8 w-8 mx-auto mb-3 text-unre-green-600" />
+            <Card key={idx} className="p-6 text-center hover:shadow-lg transition-all duration-300 bg-white border-slate-200 group">
+              <stat.icon className="h-8 w-8 mx-auto mb-3 text-unre-green-600 group-hover:scale-110 transition-transform" />
               <div className="text-3xl font-bold text-slate-900 mb-2">{stat.value}</div>
               <div className="text-sm text-slate-600">{stat.label}</div>
             </Card>
@@ -75,11 +84,16 @@ export default function Home() {
       </section>
 
       {/* Features Section */}
-      <section id="features" className="bg-white py-16">
+      <section id="features" className="bg-slate-50 py-20 border-y border-slate-200">
         <div className="container mx-auto px-4">
-          <h3 className="text-3xl font-bold text-center text-slate-900 mb-12">
-            Comprehensive Features
-          </h3>
+          <div className="text-center mb-16">
+            <h3 className="text-4xl font-bold text-slate-900 mb-4">
+              Comprehensive Features
+            </h3>
+            <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+              Enterprise-grade tools designed specifically for academic institutions
+            </p>
+          </div>
           <div className="grid md:grid-cols-3 gap-8">
             {[
               {
@@ -149,15 +163,17 @@ export default function Home() {
                 ],
               },
             ].map((feature, idx) => (
-              <Card key={idx} className="p-6 hover:shadow-lg transition-shadow">
-                <feature.icon className="h-10 w-10 text-unre-green-600 mb-4" />
-                <h4 className="text-xl font-bold text-slate-900 mb-2">{feature.title}</h4>
-                <p className="text-slate-600 mb-4">{feature.description}</p>
-                <ul className="space-y-2">
+              <Card key={idx} className="p-8 hover:shadow-xl transition-all duration-300 bg-white border-slate-200 group h-full">
+                <div className="mb-6 p-4 bg-unre-green-50 rounded-lg inline-block group-hover:bg-unre-green-100 transition-colors">
+                  <feature.icon className="h-10 w-10 text-unre-green-700" />
+                </div>
+                <h4 className="text-2xl font-bold text-slate-900 mb-3 group-hover:text-unre-green-700 transition-colors">{feature.title}</h4>
+                <p className="text-slate-600 mb-6 leading-relaxed">{feature.description}</p>
+                <ul className="space-y-3">
                   {feature.features.map((item, i) => (
-                    <li key={i} className="flex items-center text-sm text-slate-700">
-                      <CheckCircle className="h-4 w-4 text-green-600 mr-2" />
-                      {item}
+                    <li key={i} className="flex items-center text-slate-700">
+                      <CheckCircle className="h-5 w-5 text-unre-green-600 mr-3 flex-shrink-0" />
+                      <span className="leading-relaxed">{item}</span>
                     </li>
                   ))}
                 </ul>
@@ -168,11 +184,16 @@ export default function Home() {
       </section>
 
       {/* How It Works */}
-      <section className="py-16">
+      <section className="py-20 bg-white">
         <div className="container mx-auto px-4">
-          <h3 className="text-3xl font-bold text-center text-slate-900 mb-12">
-            How It Works
-          </h3>
+          <div className="text-center mb-16">
+            <h3 className="text-4xl font-bold text-slate-900 mb-4">
+              How It Works
+            </h3>
+            <p className="text-lg text-slate-600">
+              A streamlined five-step process from request to payment
+            </p>
+          </div>
           <div className="max-w-4xl mx-auto">
             {[
               {
@@ -201,13 +222,13 @@ export default function Home() {
                 description: "Bursary creates payment voucher, records payment details, updates PIGAS. Complete audit trail maintained.",
               },
             ].map((item, idx) => (
-              <div key={idx} className="flex gap-6 mb-8">
-                <div className="flex-shrink-0 h-12 w-12 bg-gradient-to-br from-unre-green-600 to-unre-green-800 rounded-full flex items-center justify-center text-white font-bold text-lg">
+              <div key={idx} className="flex gap-6 mb-10 group">
+                <div className="flex-shrink-0 h-14 w-14 bg-gradient-to-br from-unre-green-600 to-unre-green-700 rounded-full flex items-center justify-center text-white font-bold text-xl shadow-lg group-hover:shadow-xl group-hover:scale-110 transition-all duration-300">
                   {item.step}
                 </div>
-                <div>
-                  <h4 className="text-xl font-bold text-slate-900 mb-2">{item.title}</h4>
-                  <p className="text-slate-600">{item.description}</p>
+                <div className="flex-1 pt-1">
+                  <h4 className="text-xl font-bold text-slate-900 mb-2 group-hover:text-unre-green-700 transition-colors">{item.title}</h4>
+                  <p className="text-slate-600 leading-relaxed">{item.description}</p>
                 </div>
               </div>
             ))}
@@ -216,15 +237,21 @@ export default function Home() {
       </section>
 
       {/* Benefits */}
-      <section className="bg-gradient-to-r from-unre-green-600 to-unre-green-800 text-white py-16">
+      <section className="py-20 bg-gradient-to-b from-white to-slate-50">
         <div className="container mx-auto px-4">
-          <h3 className="text-3xl font-bold text-center mb-12">
-            Benefits for UNRE
-          </h3>
-          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+          <div className="text-center mb-16">
+            <h3 className="text-4xl font-bold text-slate-900 mb-4">
+              Institutional Benefits
+            </h3>
+            <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+              Comprehensive solutions designed for academic excellence and administrative efficiency
+            </p>
+          </div>
+          <div className="grid md:grid-cols-2 gap-6 max-w-6xl mx-auto">
             {[
               {
                 title: "For Management",
+                icon: "👥",
                 benefits: [
                   "Real-time visibility of spending across all cost centres",
                   "Prevent budget overruns with automated checks",
@@ -234,6 +261,7 @@ export default function Home() {
               },
               {
                 title: "For Bursary Department",
+                icon: "💼",
                 benefits: [
                   "Eliminate paper chase and lost forms",
                   "Faster processing with digital workflows",
@@ -243,6 +271,7 @@ export default function Home() {
               },
               {
                 title: "For Staff",
+                icon: "📋",
                 benefits: [
                   "Submit requests anytime, anywhere",
                   "Track status in real-time",
@@ -252,6 +281,7 @@ export default function Home() {
               },
               {
                 title: "For Auditors",
+                icon: "🔍",
                 benefits: [
                   "Complete transaction history",
                   "Tamper-proof audit logs",
@@ -260,13 +290,18 @@ export default function Home() {
                 ],
               },
             ].map((section, idx) => (
-              <Card key={idx} className="p-6 bg-white/10 backdrop-blur-sm border-white/20">
-                <h4 className="text-xl font-bold mb-4">{section.title}</h4>
-                <ul className="space-y-2">
+              <Card key={idx} className="p-8 bg-white border border-slate-200 shadow-md hover:shadow-xl transition-all duration-300 group">
+                <div className="flex items-start gap-4 mb-6">
+                  <div className="text-4xl">{section.icon}</div>
+                  <h4 className="text-2xl font-bold text-slate-900 group-hover:text-unre-green-700 transition-colors">
+                    {section.title}
+                  </h4>
+                </div>
+                <ul className="space-y-3">
                   {section.benefits.map((benefit, i) => (
-                    <li key={i} className="flex items-start">
-                      <CheckCircle className="h-5 w-5 mr-2 mt-0.5 flex-shrink-0" />
-                      <span>{benefit}</span>
+                    <li key={i} className="flex items-start text-slate-700">
+                      <CheckCircle className="h-5 w-5 mr-3 mt-0.5 flex-shrink-0 text-unre-green-600" />
+                      <span className="leading-relaxed">{benefit}</span>
                     </li>
                   ))}
                 </ul>
@@ -277,16 +312,16 @@ export default function Home() {
       </section>
 
       {/* CTA */}
-      <section className="py-16">
+      <section className="py-20 bg-gradient-to-br from-unre-green-600 to-unre-green-700">
         <div className="container mx-auto px-4 text-center">
-          <h3 className="text-3xl font-bold text-slate-900 mb-6">
+          <h3 className="text-4xl font-bold text-white mb-6">
             Ready to Transform Your GE Request Process?
           </h3>
-          <p className="text-xl text-slate-600 mb-8">
+          <p className="text-xl text-unre-green-50 mb-10 max-w-2xl mx-auto leading-relaxed">
             Join UNRE in modernizing financial operations with our comprehensive system
           </p>
           <Link href="/login">
-            <Button size="lg" className="bg-gradient-to-r from-unre-green-600 to-unre-green-700 hover:from-unre-green-700 hover:to-unre-green-800">
+            <Button size="lg" className="bg-white text-unre-green-700 hover:bg-slate-50 shadow-xl hover:shadow-2xl transition-all font-semibold text-lg px-8">
               Login to System
             </Button>
           </Link>
@@ -294,14 +329,28 @@ export default function Home() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t bg-slate-900 text-white py-8">
-        <div className="container mx-auto px-4 text-center">
-          <p className="text-slate-400">
-            © 2025 University of Natural Resources & Environment of PNG
-          </p>
-          <p className="text-slate-500 text-sm mt-2">
-            GE Request & Budget Control System v1.0
-          </p>
+      <footer className="border-t border-slate-200 bg-slate-900 text-white py-12">
+        <div className="container mx-auto px-4">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+            <div className="flex items-center gap-3">
+              <img
+                src="/images/unre-logo.png"
+                alt="UNRE Logo"
+                className="h-10 w-10 object-contain"
+              />
+              <div className="text-left">
+                <p className="font-semibold text-white">
+                  University of Natural Resources & Environment of PNG
+                </p>
+                <p className="text-slate-400 text-sm">
+                  GE Request & Budget Control System v1.0
+                </p>
+              </div>
+            </div>
+            <div className="text-slate-400 text-sm">
+              © 2025 All Rights Reserved
+            </div>
+          </div>
         </div>
       </footer>
     </div>
