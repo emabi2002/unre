@@ -10,6 +10,13 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
 
+  // Server-side only packages (not bundled for client)
+  serverExternalPackages: [
+    '@azure/identity',
+    '@microsoft/microsoft-graph-client',
+    'isomorphic-fetch',
+  ],
+
   images: {
     unoptimized: true,
     domains: [

@@ -10,7 +10,9 @@
     "format": "bunx biome format --write"
   },
   "dependencies": {
+    "@azure/identity": "^4.13.0",
     "@hookform/resolvers": "^5.2.2",
+    "@microsoft/microsoft-graph-client": "^3.0.7",
     "@radix-ui/react-avatar": "^1.1.11",
     "@radix-ui/react-dialog": "^1.1.15",
     "@radix-ui/react-label": "^2.1.8",
@@ -26,6 +28,7 @@
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
     "file-saver": "^2.0.5",
+    "isomorphic-fetch": "^3.0.0",
     "jspdf": "^3.0.4",
     "jspdf-autotable": "^5.0.2",
     "lucide-react": "^0.555.0",
