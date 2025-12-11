@@ -47,7 +47,7 @@ CREATE INDEX IF NOT EXISTS idx_division_code ON division(code);
 -- 1.3 Department / Section
 CREATE TABLE IF NOT EXISTS department (
     department_id BIGSERIAL PRIMARY KEY,
-    division_id BIGINT REFERENCES division(id) ON DELETE CASCADE,
+    division_id BIGINT REFERENCES division(division_id) ON DELETE CASCADE,
     code TEXT UNIQUE NOT NULL,
     name TEXT NOT NULL,
     description TEXT,
@@ -65,7 +65,7 @@ CREATE INDEX IF NOT EXISTS idx_department_code ON department(code);
 -- 1.4 Program
 CREATE TABLE IF NOT EXISTS program (
     program_id BIGSERIAL PRIMARY KEY,
-    division_id BIGINT REFERENCES division(id) ON DELETE CASCADE,
+    division_id BIGINT REFERENCES division(division_id) ON DELETE CASCADE,
     main_program_name TEXT NOT NULL,
     program_name TEXT NOT NULL,
     description TEXT,
