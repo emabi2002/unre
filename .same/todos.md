@@ -145,9 +145,64 @@
 
 ---
 
-## ✅ SYSTEM COMPLETE - PRODUCTION READY!
+## 🚀 NEXT PHASE: AAP & Budget Monitoring System (Version 18)
 
-All core features have been successfully implemented. The system is ready for deployment and user training.
+### 📋 New Feature: Annual Activity Plan & Budget Control
+
+**Strategic Importance:** This enhancement will link GE requests to approved Annual Activity Plans and provide comprehensive budget monitoring aligned with PNG government PGAS requirements.
+
+**Key Benefits:**
+- ✅ Bottom-up planning (AAP creation by departments)
+- ✅ Budget appropriation tracking (government allocations)
+- ✅ GE-to-AAP linkage (ensure all spending aligns with plan)
+- ✅ Budget vs Actual monitoring (real-time tracking)
+- ✅ PGAS integration (government reporting)
+
+### 🎯 Version 18 Objectives
+
+**Phase 1: Database Setup** (Week 1) - IN PROGRESS ⏳
+- [x] Create TypeScript types for AAP system (aap-types.ts)
+- [x] Create database functions for AAP operations (aap.ts)
+- [ ] Execute AAP database schema (19 new tables)
+- [ ] Create monitoring views (Budget vs Actual)
+- [ ] Set up master data (divisions, programs, activities)
+- [ ] Load chart of accounts (PGAS economic items)
+
+**Phase 2: AAP Module** (Week 2-3)
+- [ ] Create AAP management page (`/dashboard/aap`)
+- [ ] Build AAP entry form (header + line items + schedule)
+- [ ] Implement AAP approval workflow
+- [ ] Add monthly implementation scheduling
+
+**Phase 3: Budget Allocation Module** (Week 4)
+- [ ] Create budget allocation page
+- [ ] Implement PGAS import (CSV/Excel)
+- [ ] Map government appropriations to AAP lines
+- [ ] Track budget versions (Original, Revised, Supplementary)
+
+**Phase 4: Enhanced GE Integration** (Week 5-6)
+- [ ] Add AAP activity selection to GE form
+- [ ] Implement real-time budget checking (Approved - Committed - Actual)
+- [ ] Link GE transactions to budget lines
+- [ ] Update approval workflow with budget validation
+
+**Phase 5: Monitoring & Reporting** (Week 7-8)
+- [ ] Create Budget vs Actual report (replicates spreadsheet)
+- [ ] Build transaction detail view by AAP line
+- [ ] Add budget dashboard with charts
+- [ ] Implement Excel/PDF export
+
+**Phase 6: Testing & Deployment** (Week 9-10)
+- [ ] Test end-to-end workflows
+- [ ] User acceptance testing
+- [ ] Training materials update
+- [ ] Production deployment
+
+---
+
+## ✅ SYSTEM COMPLETE - Version 17 PRODUCTION READY!
+
+All Version 17 core features have been successfully implemented. The system is ready for deployment and user training.
 
 ---
 
